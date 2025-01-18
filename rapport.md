@@ -19,13 +19,6 @@
     - Un angle initial de 45 degrés,
     - Une vitesse initiale nulle ?
 
-**Q1.4** Lancer plusieurs simulations avec les mêmes paramètres de la question 1.3 et les pas de temps suivants:
-    - 0.05s
-    - 0.01s
-    - 1s
-Mesurer la durée de simulation de chaque "run": que pouvez-vous en déduire ?
-
-
 ## 2. Analyse de données
 
 > A partir de ce point du TP, il est conseillé de conserver les paramètres suivants:
@@ -49,5 +42,4 @@ compréhensible!_
 
 **Q3.2** Trouver **deux** configurations pour les conditions initiales qui font passer le système d'un état stable à un état chaotique.
 
-**Q3.3** Quels sont les deux tests implémentés dans `TestForChaos` ?
 
