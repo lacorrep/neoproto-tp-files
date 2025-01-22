@@ -28,6 +28,9 @@ class Simulator:
         self.theta_init = np.array(params["theta_init"])
         self.time_s = params["time_s"]
         self.time_step_s = params["time_step_s"]
+        if "integration_method" not in params:
+            params["integration_method"] = None
+        self.integration_method = params["integration_method"] or "auto"
         self.u: Union[np.ndarray, None] = None
         self.time_vec: Union[np.ndarray, None] = None
         self.x: Union[np.ndarray, None] = None
@@ -57,7 +60,13 @@ class Simulator:
         print("Starting run...")
         time_vec = np.arange(0.0, self.time_s+self.time_step_s, self.time_step_s)
         run_t_start = time.time()
-        u = odeint(self.mvt_eq, self.theta_init, time_vec)
+        if self.integration_method == "auto":
+            u = odeint(self.mvt_eq, self.theta_init, time_vec)
+        elif self.integration_method == "euler":
+            u = [self.theta_init]
+            for t in time_vec[:-1]:
+                u.append( u[-1] + self.time_step_s*self.mvt_eq(u[-1], t) )
+            u = np.array(u)
         run_t_end = time.time()
         run_duration = run_t_end - run_t_start
         print(f"Run executed successfully ({run_duration:.2f})")
