@@ -7,7 +7,8 @@ from scipy.constants import g
 from dataclasses import dataclass
 from typing import  Any, Dict, Union, Optional, Self
 
-RESULTS_DIR = "results"
+# RESULTS_DIR = "results"
+figures_DPI = 100
 
 @dataclass
 class DoublePendulum:
@@ -22,8 +23,8 @@ class DoublePendulum:
         self.m2 = float(self.m2)
 
 class Simulator:
-    def __init__(self, p: Optional[DoublePendulum] = None,  params: Optional[Dict[str, Any]] = None):
-        self.p: Optional[DoublePendulum] = p
+    def __init__(self, p: DoublePendulum,  params: Dict[str, Any]):
+        self.p: DoublePendulum = p
         self.theta_init = np.array(params["theta_init"])
         self.time_s = params["time_s"]
         self.time_step_s = params["time_step_s"]
@@ -60,7 +61,7 @@ class Simulator:
         run_t_end = time.time()
         run_duration = run_t_end - run_t_start
         print(f"Run executed successfully ({run_duration:.2f})")
-        result = np.hstack((time_vec.reshape(-1, 1), u))
+        result = np.column_stack((time_vec, u))
         self.time_vec = result[:, 0]
         self.u = result[:, 1:]
         self.x = np.array([self.p.l1*np.sin(self.u[:, 0]),
@@ -73,7 +74,7 @@ class Simulator:
 
 
     def plot_angles(self, save_to_file: Optional[str] = None) -> None:
-        fig, ax = plt.subplots(figsize=(12, 6))
+        fig, ax = plt.subplots(figsize=(12, 6), dpi=figures_DPI)
         ax.plot(self.time_vec, np.sin(self.u[:, 0]), label=r"$ \theta_1 $", color="blue")
         ax.plot(self.time_vec, np.sin(self.u[:, 2]), label=r"$ \theta_2 $", color="red")
         ax.set_xlabel("Time (s)")
@@ -86,22 +87,24 @@ class Simulator:
 
 
     def plot_portrait_phase(self, save_to_file: Optional[str] = None) -> None:
-        fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+        fig, ax = plt.subplots(1, 2, figsize=(12, 6), dpi=figures_DPI)
         ax[0].plot(self.u[:, 0], self.u[:, 1], color="blue")
         ax[0].set_xlabel(r"$\theta_1$")
         ax[0].set_ylabel(r"$\dot{\theta_1}$")
         ax[0].set_title("Espace des phases M1")
+        ax[0].grid(linestyle="dotted")
         ax[1].plot(self.u[:, 2], self.u[:, 3], color="red")
         ax[1].set_xlabel(r"$\theta_2$")
         ax[1].set_ylabel(r"$\dot{\theta_2}$")
         ax[1].set_title("Espace des phases M2")
+        ax[1].grid(linestyle="dotted")
         plt.show()
         if save_to_file:
             fig.savefig(save_to_file)
 
 
     def plot_trajectory(self, save_to_file: Optional[str] = None) -> None:
-        fig, ax = plt.subplots(figsize=(12, 6))
+        fig, ax = plt.subplots(figsize=(12, 6), dpi=figures_DPI)
         ax.plot(self.x[0, :], self.z[0, :], label="M1", color="blue")
         ax.plot(self.x[1, :], self.z[1, :], label="M2", color="red")
         ax.set_xlabel("x(m)")
@@ -116,7 +119,7 @@ class Simulator:
 
     def animate_trajectory(self, save_to_file: Optional[str] = None) -> animation.FuncAnimation:
         max_l = self.p.l1 + self.p.l2
-        fig = plt.figure(figsize=(6, 6))
+        fig = plt.figure(figsize=(6, 6), dpi=figures_DPI)
         ax = fig.add_subplot(autoscale_on=False, xlim=(-max_l, max_l), ylim=(-max_l, 1.))
         ax.set_aspect('equal')
         ax.grid()
